@@ -1,0 +1,756 @@
+---
+title: "The Fed: Inflation and Employment"
+output: html_notebook
+---
+
+Load Packages
+
+```{r load packages}
+library(jsonlite)
+library(tidyverse)
+library(httr)
+library(ggplot2)
+library(patchwork)
+```
+
+Make an API call to the Department of Labor for the CPI and Unemployment rate for 2000-2020
+
+```{r}
+url <- "https://api.bls.gov/publicAPI/v2/timeseries/data/"
+
+payload <- toJSON(list(
+  seriesid = list("CUSR0000SA0", "LNS14000000"),
+  startyear = "2000",
+  endyear = "2026",
+  registrationkey = Sys.getenv("BLS_KEY")
+), auto_unbox = TRUE)
+
+response <- POST(
+  url,
+  body = payload,
+  add_headers("Content-Type" = "application/json")
+)
+
+parsed <- content(response, as = "text", encoding = "UTF-8") |> fromJSON(simplifyVector = FALSE)
+
+cpi1 <- parsed$Results$series[[1]]$data
+ue1 <- parsed$Results$series[[2]]$data                              
+```
+
+Make an API call to the Department of Labor for the CPI and Unemployment rate for 2020-2026
+
+```{r}
+url <- "https://api.bls.gov/publicAPI/v2/timeseries/data/"
+
+payload1 <- toJSON(list(
+  seriesid = list("CUSR0000SA0", "LNS14000000"),
+  startyear = "2020",
+  endyear = "2026",
+  registrationkey = Sys.getenv("BLS_KEY")
+), auto_unbox = TRUE)
+
+response1 <- POST(
+  url,
+  body = payload1,
+  add_headers("Content-Type" = "application/json")
+)
+
+parsed1 <- content(response1, as = "text", encoding = "UTF-8") |> fromJSON(simplifyVector = FALSE)
+
+cpi2 <- parsed1$Results$series[[1]]$data
+ue2 <- parsed1$Results$series[[2]]$data
+```
+
+Build dataframes of the API calls
+
+```{r}
+cpi <- bind_rows(cpi1, cpi2) |> arrange(year, period) |> mutate(
+  year = as.integer(year),
+  cpi = as.numeric(value)
+) |> select(-footnotes,-latest, -value)
+
+ue <- bind_rows(ue1, ue2) |> arrange(year, period) |> mutate(
+  year = as.integer(year),
+  unemployment_rate = as.numeric(value)
+) |> select(-footnotes,-latest, -value)
+
+cpi_ue <- left_join(cpi, ue, by = c("year","period","periodName"))
+```
+
+Make an API call to the Fed for the Funds Rate
+
+```{r}
+fed_url <- "https://api.stlouisfed.org/fred/series/observations"
+
+payload2 <- GET(
+  fed_url,
+  query = list(
+    series_id = "FEDFUNDS",
+    api_key = Sys.getenv("FED_KEY"),
+    file_type = "json",
+    observation_start = "2000-01-01",
+    observation_end = "2026-02-01"
+  )
+)
+
+fed_data <- content(payload2, as="text") |> fromJSON()
+
+fed_funds <- fed_data$observations |> select(date:value) |> mutate(
+  date = as.Date(date),
+  fed_rate = value) |> 
+  select(-value) |> 
+  mutate(
+    year = year(date),
+    period = sprintf("M%02d", month(date))
+  ) |> 
+  select(-date) |> 
+  relocate(c(year, period, fed_rate))
+```
+
+Inspect the dataframe
+
+```{r}
+fed_funds
+```
+
+Join the dataframes from the API calls
+
+```{r}
+df_all <- left_join(cpi_ue,fed_funds, by=c("year", "period"))
+```
+
+Clean and adjust the data to create references
+
+```{r} 
+df_all <- df_all |> mutate(
+  month_no = as.numeric((str_extract_all(period,"\\d+")))) |> 
+  mutate(
+    year_month = ymd(as.Date(str_glue("{year}-{month_no}-01"))),
+    fed_rate = as.numeric(fed_rate),
+    inflation_mom = 100 * (log(cpi) - log(lag(cpi))),
+    inflation_yoy = 100 * (log(cpi) - log(lag(cpi, 12))),
+    unemp_change = unemployment_rate - lag(unemployment_rate),
+    fed_lag = lag(fed_rate)
+  )
+```
+
+Inspect the dataframe
+
+```{r}
+head(df_all)
+```
+
+Explore some graphs
+
+```{r}
+g1 <- ggplot(data=df_all, aes(x=year_month)) +
+  geom_line(aes(y=cpi), color = "green")
+
+g2 <- ggplot(data=df_all, aes(x=year_month)) +
+  geom_line(aes(y=unemployment_rate), color = "red") +
+  geom_line(aes(y=fed_rate), color = "purple")
+
+g1 / g2
+```
+
+Continue to explore visualization
+
+```{r}
+g1 <- ggplot(data=df_all, aes(x=year_month)) +
+  geom_line(aes(y=cpi), color = "green") 
+
+g2 <- ggplot(data=df_all, aes(x=year_month)) +
+  geom_line(aes(y=inflation_yoy), color = "red") +
+  geom_line(aes(y=unemployment_rate), color = "purple") +
+  geom_line(aes(y=fed_rate), color = "blue")
+
+g3 <- ggplot(data=df_all, aes(x=year_month)) +
+  geom_line(aes(y=inflation_yoy), color = "red") +
+  geom_line(aes(y=unemployment_rate), color = "purple") +
+  geom_line(aes(y=fed_rate), color = "blue")
+
+g2 <- ggplot(data=df_all, aes(x=year_month)) +
+  geom_line(aes(y=inflation_yoy), color = "red") +
+  geom_line(aes(y=unemployment_rate), color = "purple") +
+  geom_line(aes(y=fed_rate), color = "blue")
+      
+
+g1 / g2 /g3
+```
+
+Prepare a Linear model of the fed rate, inflation rate, and unemployment correlation
+
+```{r}
+model <- lm(fed_rate ~ fed_lag + inflation_yoy + unemployment_rate, df_all)
+
+summary(model)
+```
+
+```{r}
+cor(df_all$inflation_yoy, lag(df_all$fed_rate, 12), use="complete.obs")
+```
+
+Prepare a chart of the main data
+
+```{r}
+df_long <- df_all |>
+  select(year_month, cpi, unemployment_rate, fed_rate) |>
+  pivot_longer(
+    cols = -year_month,
+    names_to = "series",
+    values_to = "value"
+  )
+
+df_long$series <- factor(
+  df_long$series,
+  levels = c("cpi", "unemployment_rate", "fed_rate")
+)
+
+ggplot(df_long, aes(x = year_month, y = value, color = series)) +
+  geom_line(size = 1) +
+  facet_wrap(
+    ~series,
+    ncol = 1,
+    scales = "free_y",
+    labeller = labeller(
+      series = c(
+        cpi     = "Consumer Price Index ($)",
+        unemployment_rate = "Unemployment Rate (%)",
+        fed_rate          = "Federal Funds Rate (%)"
+      )
+    )
+  ) +
+  scale_color_manual(
+    values = c(
+      cpi     = "#2CA02C",
+      unemployment_rate = "#D62728",
+      fed_rate          = "purple"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 14, face = "bold")
+  ) +
+  labs(
+    x = "Year",
+    y = ""
+  )
+```
+Calculate the average inflation rate
+
+```{r}
+inflation_avg <- df_all |> summarise(avg_inflation_yoy = mean(inflation_yoy, na.rm = TRUE))
+
+inflation_avg_yoy <- df_all |> group_by(year) |> summarise(avg_inflation_yoy = mean(inflation_yoy, na.rm =TRUE))
+
+inflation_avg
+```
+
+Create an average inflation chart by year
+
+```{r}
+inflation_avg_yoy <- inflation_avg_yoy |> mutate(
+  target_inflation_yoy = 2.00
+)
+
+inflation_avg_yoy
+```
+
+Explore a possible plot
+
+```{r}
+ggplot(inflation_avg_yoy, aes(x=year)) +
+  geom_line(aes(y=avg_inflation_yoy)) +
+  geom_line(aes(y=target_inflation_yoy))
+```
+
+Prepare a dataframe for analysis
+
+```{r}
+constant2pct_rate <- list(1.00)
+year <- list("2000-01-01")
+
+rate_mult <- 1.02^25
+
+for (n in 1:25) {
+  rate <- 1.02^n
+  constant2pct_rate[[length(constant2pct_rate)+1]] <- rate
+  thisyear <- paste0((2000+n),"-","01","-","01")
+  year[[length(year)+1]] <- thisyear
+}
+
+
+df <- data_frame(year_month = unlist(year), rate_change = unlist(constant2pct_rate)) |> mutate(
+  year_month = as.Date(year_month)
+)
+
+df <- left_join(df, df_all, by = "year_month")
+
+df <- df |>  mutate(
+  cpiplus_2pct = cpi[1] * rate_change,
+  overprevyr2pct = lag(cpi) * 1.02,
+  pct_yoy = (lead(cpi)/cpi-1)*100
+)
+```
+
+Calculate the average inflation rate
+
+```{r}
+avg_inflation <- df |> summarise(mean(inflation_yoy, na.rm = TRUE))
+```
+
+Calculate the inflation count
+
+```{r}
+inflation_count <- df |>  summarise(above_target = sum(inflation_yoy >2, na.rm = TRUE))
+```
+
+Inspect the dataframe
+
+```{r}
+df
+```
+
+Explore the plot with a linechart
+
+```{r}
+ggplot(df, aes(x=year_month)) +
+  geom_line(aes(y=cpi, color = "red")) +
+  geom_line(aes(y=cpiplus_2pct, color = "green")) +
+  geom_line(aes(y=overprevyr2pct, color = "blue"))
+
+```
+
+Prepare the dataframe for more analysis
+
+```{r}
+df <- df |> mutate(
+  deviation = pct_yoy - 2,
+  cum_dev = cumsum(deviation),
+  unemployment_change = unemployment_rate - lag(unemployment_rate, default = 0),
+  cum_unempl_change = cumsum(unemployment_change)
+)
+```
+
+Calculate average unemployment
+
+```{r}
+avg_unemployment <- df |> summarise(mean(unemployment_rate, na.rm = TRUE))
+```
+
+Create a chart for inflation deviation
+
+```{r}
+ggplot(df, aes(x = year_month)) +
+  geom_col(aes(y = deviation, fill = deviation > 0)) +
+  geom_line(aes(y = cum_dev), color = "#D62728", size = 1.2) +
+  geom_hline(yintercept = 0, linetype = "dashed", size = 1) +
+  scale_fill_manual(
+    values = c("TRUE" = "#D62728",
+               "FALSE" = "blue"),
+    guide = "none"
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Year",
+    y = "Inflation deviation from 2% target",
+    caption = "Inflation deviation\nBars: annual deviation | Line: cumulative deviation",
+    title = NULL
+  ) +
+  theme(
+    text = element_text(color = "gray30"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(
+      size = 12,
+      hjust = 0
+    ),
+    plot.caption.position = "plot"
+  ) +
+  scale_x_date(expand = expansion(mult = c(0.01, 0.08)))
+```
+Create a chart for unempployment deviation
+
+```{r}
+ggplot(df, aes(x = year_month)) +
+  geom_col(aes(y = unemployment_change, fill = unemployment_change > 0)) +
+  geom_line(aes(y = cum_unempl_change), color = "#D62728", size = 1.2) +
+  geom_hline(yintercept = 0, linetype = "dashed", size = 1) +
+  scale_fill_manual(
+    values = c("TRUE" = "#D62728",
+               "FALSE" = "blue"),
+    guide = "none"
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Year",
+    y = "Unemployment deviation",
+    caption = "Unemployment deviation\nBars: annual deviation | Line: cumulative deviation",
+    title = NULL
+  ) +
+  theme(
+    text = element_text(color = "gray30"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(
+      size = 12,
+      hjust = 0
+    ),
+    plot.caption.position = "plot"
+  ) +
+  scale_x_date(expand = expansion(mult = c(0.01, 0.08)))
+```
+
+Chart the main data
+
+```{r}
+df_long <- df_all |>
+  select(year_month, inflation_yoy, unemployment_rate, fed_rate) |>
+  pivot_longer(
+    cols = -year_month,
+    names_to = "series",
+    values_to = "value"
+  )
+
+df_long$series <- factor(
+  df_long$series,
+  levels = c("inflation_yoy", "unemployment_rate", "fed_rate")
+)
+
+ggplot(df_long, aes(x = year_month, y = value, color = series)) +
+  geom_line(size = 1) +
+  facet_wrap(
+    ~series,
+    ncol = 1,
+    scales = "free_y",
+    labeller = labeller(
+      series = c(
+        inflation_yoy = "Annual Inflation Rate (%)",
+        unemployment_rate = "Unemployment Rate (%)",
+        fed_rate          = "Federal Funds Rate (%)"
+      )
+    )
+  ) +
+  scale_color_manual(
+    values = c(
+      inflation_yoy     = "#2CA02C",
+      unemployment_rate = "#D62728",
+      fed_rate          = "purple"
+    )
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 14, face = "bold")
+  ) +
+  labs(
+    x = "Year",
+    y = ""
+  )
+```
+Prepare subsets of data
+
+```{r}
+df_2008 <- df_all |> filter(year >= 2007 & year <= 2012) |> select(year_month, inflation_yoy, unemployment_rate, fed_rate) |>
+  pivot_longer(
+    cols = -year_month,
+    names_to = "series",
+    values_to = "value"
+  )
+
+df_2020 <- df_all |> filter(year >= 2019 & year <= 2025) |> select(year_month, inflation_yoy, unemployment_rate, fed_rate) |>
+  pivot_longer(
+    cols = -year_month,
+    names_to = "series",
+    values_to = "value"
+  )
+```
+
+Prepare a chart to highlight 2008 and 2020
+
+```{r}
+df_long <- df_all |> 
+  select(year_month, inflation_yoy, unemployment_rate, fed_rate) |>
+  pivot_longer(
+    cols = -year_month,
+    names_to = "series",
+    values_to = "value"
+  )
+
+df_long$series <- factor(
+  df_long$series,
+  levels = c("inflation_yoy", "unemployment_rate", "fed_rate")
+)
+
+
+ggplot(df_long, aes(x = year_month, y = value)) +
+
+  geom_line(aes(group = series), color = "gray70", size = 0.8, alpha = 0.5) +
+
+  
+  geom_line(
+    data = df_2008,
+    aes(x = year_month, y = value, color = series),
+    size = 1.3
+  ) +
+
+
+  geom_line(
+    data = df_2020,
+    aes(x = year_month, y = value, color = series),
+    size = 1.3
+  ) +
+
+  
+  facet_wrap(
+    ~series,
+    ncol = 1,
+    scales = "free_y",
+    labeller = labeller(
+      series = c(
+        inflation_yoy = "Annual Inflation Rate (%)",
+        unemployment_rate = "Unemployment Rate (%)",
+        fed_rate = "Federal Funds Rate (%)"
+      )
+    )
+  ) +
+
+  # Colors for highlights
+  scale_color_manual(
+    values = c(
+      inflation_yoy     = "#2CA02C",
+      unemployment_rate = "#D62728",
+      fed_rate          = "purple"
+    )
+  ) +
+
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "none", # or "none" if you prefer no legend
+    strip.text = element_text(size = 14, color = "gray70"),
+    axis.title = element_text(color = "gray70", size = 14),
+    axis.text = element_text(color = "gray70", size = 12),
+    panel.grid = element_blank()
+  ) +
+
+  labs(
+    x = "Year",
+    y = "Percentage",
+    color = "gray70"
+  )
+```
+
+Explore a possible chart
+
+```{r}
+df <- df %>%
+  arrange(year_month) %>%
+  mutate(fed_rate_lag12 = lag(fed_rate, 1))  # 12-month lag
+
+ggplot(df, aes(x = year_month)) +
+
+  # Bars: annual inflation deviation
+  geom_col(aes(y = deviation, fill = deviation > 0), alpha = 0.7) +
+
+  # Cumulative deviation line
+  geom_line(aes(y = cum_dev), color = "black", size = 1.2) +
+
+  # Lagged Fed rate line (scaled if necessary)
+  geom_line(aes(y = fed_rate_lag12), color = "#1F77B4", size = 1, linetype = "dashed") +
+
+  # Zero line
+  geom_hline(yintercept = 0, linetype = "dashed", size = 0.8) +
+
+  # Color scale for bars
+  scale_fill_manual(values = c("TRUE" = "#D62728", "FALSE" = "blue"), guide = "none") +
+
+  # Minimal theme
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.caption = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.caption.position = "plot"
+  ) +
+
+  # Labels
+  labs(
+    x = "Year",
+    y = "Inflation Deviation / Fed Rate",
+    caption = "Bars = deviation from 2% target | Solid line = cumulative deviation | Dashed blue line = Fed rate (12-month lag)"
+  )
+```
+
+Subset the subset
+
+```{r}
+df_2008_slice <- df_2008 |> filter(year_month >= "2008-01-01" & year_month <= "2010-01-01")
+```
+
+Prepare a highlighted graph of 2008
+
+```{r}
+ggplot(df_2008, aes(x = year_month, y = value)) +
+
+  # Gray background lines
+  geom_line(aes(group = series), color = "gray70", size = 0.8, alpha = 0.5, show.legend = FALSE) +
+
+  # Highlighted slice
+  geom_line(
+    data = df_2008_slice,
+    aes(x = year_month, y = value, color = series),
+    size = 1.3
+  ) +
+
+  # Facets
+ # facet_wrap(
+ #   ~series,
+#    ncol = 1,
+#    scales = "free_y",
+#    labeller = labeller(
+#      series = c(
+#        inflation_yoy = "Annual Inflation Rate (%)",
+#        unemployment_rate = "Unemployment Rate (%)",
+#        fed_rate = "Federal Funds Rate (%)"
+#      )
+#    )
+#  ) +
+
+  # Colors and custom legend labels
+  scale_color_manual(
+    values = c(
+      inflation_yoy     = "#2CA02C",
+      unemployment_rate = "#D62728",
+      fed_rate          = "purple"
+    ),
+    labels = c(
+      inflation_yoy     = "Inflation (YoY %)",
+      unemployment_rate = "Unemployment (%)",
+      fed_rate          = "Fed Rate (%)"
+    )
+  ) +
+
+  # Theme
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "top",   # show the legend
+    legend.text = element_text(color = "gray70"),
+    strip.text = element_text(size = 14, color = "gray70"),
+    axis.title = element_text(color = "gray70", size = 14),
+    axis.text = element_text(color = "gray70", size = 12),
+    panel.grid = element_blank()
+  ) +
+
+  labs(
+    x = "Year",
+    y = "Percentage",
+    color = NULL  # removes default "Series" title
+  )
+```
+
+```{r}
+df_2020_slice <- df_2020 |> filter(year_month >= "2020-01-01" & year_month <= "2025-01-01")
+```
+
+Prepare a highlight of 2020 crisis
+```{r}
+ggplot(df_2020, aes(x = year_month, y = value)) +
+
+  # Gray background lines
+  geom_line(aes(group = series), color = "gray70", size = 0.8, alpha = 0.5, show.legend = FALSE) +
+
+  # Highlighted slice
+  geom_line(
+    data = df_2020_slice,
+    aes(x = year_month, y = value, color = series),
+    size = 1.3
+  ) +
+
+  # Facets
+ # facet_wrap(
+ #   ~series,
+#    ncol = 1,
+#    scales = "free_y",
+#    labeller = labeller(
+#      series = c(
+#        inflation_yoy = "Annual Inflation Rate (%)",
+#        unemployment_rate = "Unemployment Rate (%)",
+#        fed_rate = "Federal Funds Rate (%)"
+#      )
+#    )
+#  ) +
+
+  # Colors and custom legend labels
+  scale_color_manual(
+    values = c(
+      inflation_yoy     = "#2CA02C",
+      unemployment_rate = "#D62728",
+      fed_rate          = "purple"
+    ),
+    labels = c(
+      inflation_yoy     = "Inflation (YoY %)",
+      unemployment_rate = "Unemployment (%)",
+      fed_rate          = "Fed Rate (%)"
+    )
+  ) +
+
+  # Theme
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "top",   # show the legend
+    legend.text = element_text(color = "gray70"),
+    strip.text = element_text(size = 14, color = "gray70"),
+    axis.title = element_text(color = "gray70", size = 14),
+    axis.text = element_text(color = "gray70", size = 12),
+    panel.grid = element_blank()
+  ) +
+
+  labs(
+    x = "Year",
+    y = "Percentage",
+    color = NULL  # removes default "Series" title
+  )
+```
+
+
+
+```{r}
+ggplot(df_2008, aes(x = year_month, y = value)) +
+
+  geom_line(aes(group = series, color = series), size = 0.8, alpha = 0.5) +
+
+  
+  geom_line(
+    data = df_2008,
+    aes(x = year_month, y = value, color = series),
+    size = 1.3
+  ) +
+  scale_color_manual(
+    values = c(
+      inflation_yoy     = "#2CA02C",
+      unemployment_rate = "#D62728",
+      fed_rate          = "purple"
+    ),
+    labels = c(
+      inflation_yoy     = "Inflation (YoY %)",
+      unemployment_rate = "Unemployment (%)",
+      fed_rate          = "Federal Funds Rate (%)"
+    )
+  ) +
+
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(color = "gray70"),
+    strip.text = element_text(size = 14, color = "gray70"),
+    axis.title = element_text(color = "gray70", size = 14),
+    axis.text = element_text(color = "gray70", size = 12),
+    panel.grid = element_blank()
+  ) +
+
+  labs(
+    x = "Year",
+    y = "Percentage",
+    color = NULL
+  )
+```
+
