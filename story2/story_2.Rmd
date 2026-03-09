@@ -632,11 +632,11 @@ ggplot(df_2008, aes(x = year_month, y = value)) +
   # Theme
   theme_minimal(base_size = 14) +
   theme(
-    legend.position = "top",   # show the legend
+    legend.position = "right",   # show the legend
     legend.text = element_text(color = "gray70"),
     strip.text = element_text(size = 14, color = "gray70"),
-    axis.title = element_text(color = "gray70", size = 14),
-    axis.text = element_text(color = "gray70", size = 12),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
     panel.grid = element_blank()
   ) +
 
@@ -696,11 +696,11 @@ ggplot(df_2020, aes(x = year_month, y = value)) +
   # Theme
   theme_minimal(base_size = 14) +
   theme(
-    legend.position = "top",   # show the legend
+    legend.position = "right",   # show the legend
     legend.text = element_text(color = "gray70"),
     strip.text = element_text(size = 14, color = "gray70"),
-    axis.title = element_text(color = "gray70", size = 14),
-    axis.text = element_text(color = "gray70", size = 12),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
     panel.grid = element_blank()
   ) +
 

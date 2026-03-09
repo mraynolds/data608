@@ -4,11 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="024933ea-00db-43d4-83f3-b3964b8c8919" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/discussion_wk03.ipynb" afterDir="false" />
+    <list default="true" id="024933ea-00db-43d4-83f3-b3964b8c8919" name="Changes" comment="Commit Story2 and other updates">
+      <change afterPath="$PROJECT_DIR$/discussion_wk04_context.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/story3/story3.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assignment1/assignment1.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/assignment1/assignment1.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/IIJA FUNDING AS OF MARCH 2023.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/assignment1/data/IIJA FUNDING AS OF MARCH 2023.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/discussion_wk03.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/discussion_wk03.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story1/assignment1.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/story1/assignment1.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story2/story_2.Rmd" beforeDir="false" afterPath="$PROJECT_DIR$/story2/story_2.Rmd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story2/story_2.nb.html" beforeDir="false" afterPath="$PROJECT_DIR$/story2/story_2.nb.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +44,9 @@
   &quot;associatedIndex&quot;: 7
 }</component>
   <component name="ProjectId" id="39BULSe7AD59xpD6FNvAFxXKHDb" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -91,7 +97,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770575791676</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Commit Story2 and other updates">
+      <option name="closed" value="true" />
+      <created>1771821241684</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1771821241684</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -122,7 +136,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="assignment1 commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="assignment1 commit" />
+    <MESSAGE value="Commit Story2 and other updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit Story2 and other updates" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
