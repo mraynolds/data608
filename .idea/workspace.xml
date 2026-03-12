@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="024933ea-00db-43d4-83f3-b3964b8c8919" name="Changes" comment="Commit Story3">
-      <change beforePath="$PROJECT_DIR$/story2/story2v2.pptx" beforeDir="false" afterPath="$PROJECT_DIR$/story2/story2v2.pptx" afterDir="false" />
+    <list default="true" id="024933ea-00db-43d4-83f3-b3964b8c8919" name="Changes" comment="Commit Story2v2">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story3/story3.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/story3/story3.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +116,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773033452204</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Commit Story2v2">
+      <option name="closed" value="true" />
+      <created>1773158632803</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1773158632803</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -148,7 +157,8 @@
     <MESSAGE value="assignment1 commit" />
     <MESSAGE value="Commit Story2 and other updates" />
     <MESSAGE value="Commit Story3" />
-    <option name="LAST_COMMIT_MESSAGE" value="Commit Story3" />
+    <MESSAGE value="Commit Story2v2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit Story2v2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
