@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="024933ea-00db-43d4-83f3-b3964b8c8919" name="Changes" comment="Commit Story3v2">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/story3/discussion_wk6_salience.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/story4/story4.ipynb" afterDir="false" />
+    <list default="true" id="024933ea-00db-43d4-83f3-b3964b8c8919" name="Changes" comment="Commit Story4">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -142,7 +139,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773619209103</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Commit Story4">
+      <option name="closed" value="true" />
+      <created>1774249780240</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1774249780241</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -177,7 +182,8 @@
     <MESSAGE value="Commit Story3" />
     <MESSAGE value="Commit Story2v2" />
     <MESSAGE value="Commit Story3v2" />
-    <option name="LAST_COMMIT_MESSAGE" value="Commit Story3v2" />
+    <MESSAGE value="Commit Story4" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit Story4" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
