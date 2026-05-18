@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="024933ea-00db-43d4-83f3-b3964b8c8919" name="Changes" comment="Commit Story4">
+    <list default="true" id="024933ea-00db-43d4-83f3-b3964b8c8919" name="Changes" comment="Commit Story4v2">
+      <change afterPath="$PROJECT_DIR$/story6/discussion_week_12.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/story7/story7.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story4/~$story4.pptx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,7 +150,47 @@
       <option name="project" value="LOCAL" />
       <updated>1774249780241</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Commit Story4v2">
+      <option name="closed" value="true" />
+      <created>1774270301159</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1774270301159</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Commit Story4v2">
+      <option name="closed" value="true" />
+      <created>1774270427107</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1774270427107</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Commit Story4v2">
+      <option name="closed" value="true" />
+      <created>1776652527652</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1776652527652</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Commit Story4v2">
+      <option name="closed" value="true" />
+      <created>1776652562953</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1776652562953</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Commit Story4v2">
+      <option name="closed" value="true" />
+      <created>1778026581922</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1778026581922</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -183,7 +226,8 @@
     <MESSAGE value="Commit Story2v2" />
     <MESSAGE value="Commit Story3v2" />
     <MESSAGE value="Commit Story4" />
-    <option name="LAST_COMMIT_MESSAGE" value="Commit Story4" />
+    <MESSAGE value="Commit Story4v2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit Story4v2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -202,6 +246,86 @@
           <url>file://$PROJECT_DIR$/assignment1/assignment1.ipynb</url>
           <line>86</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story4/story4.ipynb</url>
+          <line>66</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story5/story5.ipynb</url>
+          <line>1</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>801</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>1573</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>43</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>72</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>82</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>224</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>733</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>1114</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>1727</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>2171</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>2200</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story6/story6.ipynb</url>
+          <line>2262</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story7/story7.ipynb</url>
+          <line>108</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/story7/story7.ipynb</url>
+          <line>1068</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
